@@ -1,14 +1,14 @@
 from fastapi import FastAPI
-from db.connection import get_connection
+
+from routes import films, actors, statistics
 
 app = FastAPI()
+
+app.include_router(films.router)
+app.include_router(actors.router)
+app.include_router(statistics.router)
 
 
 @app.get("/")
 def read_root():
-    try:
-        connection = get_connection()
-        if connection.is_connected():
-            return {"message": "Connected to sakila db"}
-    except Exception as e:
-        return {"error": e}
+    return {"message": "Sakila API is running"}

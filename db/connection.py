@@ -21,3 +21,12 @@ def get_connection() -> MySQLConnection:
         password=_get_env_var("DB_PASSWORD"),
         database=_get_env_var("DB_NAME")
     )
+
+
+def get_logging_connection() -> MySQLConnection:
+    return mysql.connector.connect(
+        host=_get_env_var("LOG_DB_HOST"),
+        user=_get_env_var("LOG_DB_USER"),
+        password=_get_env_var("LOG_DB_PASSWORD"),
+        database=_get_env_var("LOG_DB_NAME")
+    )
