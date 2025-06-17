@@ -1,7 +1,8 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Path
 
 from db.connection import get_connection
 from models.actor import Actor
+from routes.recorder import save_search_keyword
 
 router = APIRouter()
 
@@ -32,8 +33,39 @@ def get_all_actors():
     return actors
 
 
+@router.get("/actors/search", response_model=list[Actor])
+def search_actor_by_keyword(name: str):
+    connection = get_connection()
+    cursor = connection.cursor()
+    like_pattern = f"%{name}%"
+    cursor.execute(
+        """
+        SELECT
+            actor_id,
+            first_name,
+            last_name
+        FROM actor
+        WHERE first_name LIKE %s OR last_name LIKE %s
+        """,
+        (like_pattern, like_pattern)
+    )
+    rows = cursor.fetchall()
+    cursor.close()
+    connection.close()
+
+    if not rows:
+        raise HTTPException(status_code=404, detail="No actor(s) found")
+
+    save_search_keyword(keyword=name, search_type="actor")
+
+    return [
+        Actor(actor_id=row[0], first_name=row[1], last_name=row[2])
+        for row in rows
+    ]
+
+
 @router.get("/actors/{actor_id}", response_model=Actor)
-def get_actor_by_id(actor_id: int):
+def get_actor_by_id(actor_id: int = Path(..., ge=1, le=200, description="ID of an actor (1-200)")):
     connection = get_connection()
     cursor = connection.cursor()
     cursor.execute(
