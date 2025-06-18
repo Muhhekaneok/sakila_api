@@ -34,7 +34,7 @@ def get_all_films():
     return films
 
 
-@router.get("/films/search", response_model=list[Film])
+@router.get("/films/name-keyword", response_model=list[Film])
 def search_films_by_keyword(keyword: str):
     connection = get_connection()
     cursor = connection.cursor()

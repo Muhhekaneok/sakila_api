@@ -33,7 +33,7 @@ def get_all_actors():
     return actors
 
 
-@router.get("/actors/search", response_model=list[Actor])
+@router.get("/actors/name-keyword", response_model=list[Actor])
 def search_actor_by_keyword(name: str):
     connection = get_connection()
     cursor = connection.cursor()
